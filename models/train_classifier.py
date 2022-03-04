@@ -87,9 +87,9 @@ def build_model():
             model_cv: classification GridSearchCV object (model)
     """
     model = Pipeline([
-        ('vectorizer', CountVectorizer(tokenizer=tokenize)),
-        ('transformer', TfidfTransformer()),
-        ('classifier', MultiOutputClassifier(AdaBoostClassifier()))
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf', MultiOutputClassifier(AdaBoostClassifier()))
     ])
     model_parameters = {
         'tfidf__use_idf': (True, False),
@@ -97,7 +97,7 @@ def build_model():
     }
 
     model_cv = GridSearchCV(model, param_grid=model_parameters)
-    return model
+    return model_cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
