@@ -11,7 +11,7 @@ def load_data(messages_filepath, categories_filepath):
         Summary: utility function to load and merge message and category data
 
         Parameters:
-            messages_filepath(str): the message data file path
+            messages_filepath(str): the messase data file path
             categories_filepath(str): the category data file path
 
         Returns:
@@ -59,7 +59,7 @@ def save_data(df, database_filename):
             database_filename(str): database file name
     """
     engine = create_engine('sqlite:///{}'.format(database_filename))
-    df.to_sql('DisasterResponseTable', engine, index=False)
+    df.to_sql('DisasterResponseTable', engine, if_exists='replace', index=False)
 
 
 def main():
