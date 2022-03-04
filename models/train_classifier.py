@@ -11,9 +11,9 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline
 from sqlalchemy import create_engine
@@ -22,6 +22,17 @@ nltk.download(['wordnet', 'punkt', 'stopwords'])
 
 
 def load_data(database_filepath):
+    """
+        Summary: utility function to load saved data from SQLite database
+
+        Parameters:
+            database_filepath(str): database file path
+
+        Returns:
+            X (DataFrame) : dataframe containing messages(features)
+            Y (DataFrame) : target categories
+            category (list of str) : target labels list
+    """
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql_table('DisasterResponseTable', engine)
     X = df['message']  # message column
@@ -32,19 +43,19 @@ def load_data(database_filepath):
 def tokenize(text):
     """
     Summary: utility function to pre-processes the text
-    
+
     Parameters:
-      text(str): the message
-    
+            text(str): the message
+
     Returns:
-      lemmatized_text(list of str): a list of the root form of the words
+            lemmatized_text(list of str): a list of the root form of the words
     """
     # remove URLs
     patterns = [r"http\S+", r"www\S+"]
     for pattern in patterns:
         text = re.sub(pattern, "", text)
 
-    # strip html tags    
+    # strip html tags
     soup = BeautifulSoup(text, "html.parser")
     text = soup.get_text()
 
@@ -69,15 +80,36 @@ def tokenize(text):
 
 
 def build_model():
-    ada_boost_pipeline = Pipeline([
-        ('vectorizer', TfidfVectorizer(tokenizer=tokenize)),
+    """
+        Summary: utility function to build machine learning pipeline to classifiy disaster messages
+
+        Returns:
+            model_cv: classification GridSearchCV object (model)
+    """
+    model = Pipeline([
+        ('vectorizer', CountVectorizer(tokenizer=tokenize)),
         ('transformer', TfidfTransformer()),
         ('classifier', MultiOutputClassifier(AdaBoostClassifier()))
     ])
-    return ada_boost_pipeline
+    model_parameters = {
+        'tfidf__use_idf': (True, False),
+        'clf__estimator__n_estimators': [50, 60, 70]
+    }
+
+    model_cv = GridSearchCV(model, param_grid=model_parameters)
+    return model
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+        Summary: utility function to evaluate the model and print the f1 score, precision and recall for each output category
+
+        Parameters:
+            model: trained classification model
+            X_test: test messages/features to be evaluated
+            Y_test: test categories for respective test massages
+            category_names(list): list of names of categories
+    """
     Y_pred = model.predict(X_test)
     counter = 0
     for category in category_names:
@@ -88,6 +120,13 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """
+        Summary: utility function to saved trained classification model
+
+        Parameters:
+            model: trained classification model
+            model_filepath(str): pickle file path where model is to be saved
+    """
     with open(model_filepath, 'wb') as f:
         pickle.dump(model, f)
 
