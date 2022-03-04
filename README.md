@@ -9,7 +9,8 @@ This is a Udacity Data Scientist Nanodegree project. The aim of this project is 
     -  Merges the two datasets
     -  Cleans the data 
     -  Stores it in a SQLite database
-####2. models\train_classifier.py (ML Pipeline)
+     
+#### 2. models\train_classifier.py (ML Pipeline)
     - Loads data from the SQLite database
     - Splits the dataset into training and test sets
     - Builds a text processing and machine learning pipeline
@@ -17,7 +18,7 @@ This is a Udacity Data Scientist Nanodegree project. The aim of this project is 
     - Outputs results on the test set
     - Exports the final model as a pickle file
     
-####3. Web Application
+#### 3. Web Application
     - The Flask application displays visualizations based on data we extract from SQLite database. 
     - The web app can also classify a disaster event message into the output categories. 
 
