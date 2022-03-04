@@ -19,6 +19,7 @@ def load_data(messages_filepath, categories_filepath):
     """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
+    # merge messages and category dataframes
     df = messages.merge(categories, on='id', how='inner')
     return df
 
@@ -33,11 +34,13 @@ def clean_data(df):
         Returns:
             df(DataFrame): a cleaned dataframe containing messages and categories
     """
+    # splitting categories into columns
     categories = df['categories'].str.split(';', expand=True)
     row = categories.head(1)
     category_column_names = row.applymap(lambda x: x[:-2]).iloc[0, :]
     category_column_names = category_column_names.tolist()
     categories.columns = category_column_names
+
     for column in categories:
         # set each value to be the last character of the string
         categories[column] = categories[column].astype(str).str[-1]
@@ -46,6 +49,8 @@ def clean_data(df):
         categories[column] = categories[column].astype(int)
     df = df.drop(['categories'], axis=1)
     df = pd.concat([df, categories], axis=1, join='inner')
+
+    # drop duplicates from the dataframe
     df.drop_duplicates(inplace=True)
     return df
 
