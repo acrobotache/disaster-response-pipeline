@@ -96,7 +96,7 @@ def build_model():
         'clf__estimator__n_estimators': [50, 60, 70]
     }
 
-    model_cv = GridSearchCV(model, param_grid=model_parameters)
+    model_cv = GridSearchCV(model, param_grid=model_parameters, verbose=3, cv=3)
     return model_cv
 
 
