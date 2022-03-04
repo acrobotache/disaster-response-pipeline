@@ -47,6 +47,11 @@ def clean_data(df):
 
         # convert column from string to numeric
         categories[column] = categories[column].astype(int)
+
+    # replacing '2' in the dataset (found in 'related' column) with '1' (majority count)
+    categories.replace(2, 1, inplace=True)
+
+    # drop original categories column
     df = df.drop(['categories'], axis=1)
     df = pd.concat([df, categories], axis=1, join='inner')
 
