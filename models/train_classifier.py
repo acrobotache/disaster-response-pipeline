@@ -18,7 +18,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline
 from sqlalchemy import create_engine
 
-nltk.download(['wordnet', 'punkt', 'stopwords'])
+nltk.download(['wordnet', 'punkt', 'stopwords', 'omw-1.4'])
 
 
 def load_data(database_filepath):
